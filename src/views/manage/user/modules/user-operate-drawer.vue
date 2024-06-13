@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue';
 import { useFormRules, useNaiveForm } from '@/hooks/common/form';
-import { fetchGetAllRoles } from '@/service/api';
+import { createUser, fetchGetAllRoles, updateRole } from '@/service/api';
 import { $t } from '@/locales';
 import { enableStatusOptions, userGenderOptions } from '@/constants/business';
 
@@ -41,28 +41,32 @@ const title = computed(() => {
 
 type Model = Pick<
   Api.SystemManage.User,
-  'userName' | 'userGender' | 'nickName' | 'userPhone' | 'userEmail' | 'userRoles' | 'status'
+  'id' | 'userName' | 'password' | 'userGender' | 'nickName' | 'userPhone' | 'userEmail' | 'userRoles' | 'status'
 >;
 
 const model: Model = reactive(createDefaultModel());
 
 function createDefaultModel(): Model {
   return {
+    id: 0,
     userName: '',
-    userGender: null,
+    password: '',
+    userGender: '1',
     nickName: '',
     userPhone: '',
     userEmail: '',
     userRoles: [],
-    status: null
+    status: '1'
   };
 }
 
-type RuleKey = Extract<keyof Model, 'userName' | 'status'>;
+type RuleKey = Extract<keyof Model, 'userName' | 'password' | 'status' | 'userEmail'>;
 
 const rules: Record<RuleKey, App.Global.FormRule> = {
   userName: defaultRequiredRule,
-  status: defaultRequiredRule
+  password: defaultRequiredRule,
+  status: defaultRequiredRule,
+  userEmail: defaultRequiredRule
 };
 
 /** the enabled role options */
@@ -70,7 +74,6 @@ const roleOptions = ref<CommonType.Option<string>[]>([]);
 
 async function getRoleOptions() {
   const { error, data } = await fetchGetAllRoles();
-
   if (!error) {
     const options = data.map(item => ({
       label: item.roleName,
@@ -103,8 +106,16 @@ function closeDrawer() {
 
 async function handleSubmit() {
   await validate();
-  // request
-  window.$message?.success($t('common.updateSuccess'));
+  if (props.operateType === 'add') {
+    await createUser(model).then(_resp => {
+      window.$message?.success($t('common.addSuccess'));
+    });
+  } else if (props.operateType === 'edit' && props.rowData) {
+    const { id, ...rest } = model;
+    await updateRole(id, rest).then(_resp => {
+      window.$message?.success($t('common.updateSuccess'));
+    });
+  }
   closeDrawer();
   emit('submitted');
 }
@@ -124,6 +135,9 @@ watch(visible, () => {
       <NForm ref="formRef" :model="model" :rules="rules">
         <NFormItem :label="$t('page.manage.user.userName')" path="userName">
           <NInput v-model:value="model.userName" :placeholder="$t('page.manage.user.form.userName')" />
+        </NFormItem>
+        <NFormItem :label="$t('page.manage.user.password')" path="password">
+          <NInput v-model:value="model.password" type="password" :placeholder="$t('page.manage.user.form.password')" />
         </NFormItem>
         <NFormItem :label="$t('page.manage.user.userGender')" path="userGender">
           <NRadioGroup v-model:value="model.userGender">

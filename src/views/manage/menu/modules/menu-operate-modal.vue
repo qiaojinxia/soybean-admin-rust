@@ -6,7 +6,7 @@ import { $t } from '@/locales';
 import { enableStatusOptions, menuIconTypeOptions, menuTypeOptions } from '@/constants/business';
 import SvgIcon from '@/components/custom/svg-icon.vue';
 import { getLocalIcons } from '@/utils/icon';
-import { fetchGetAllRoles } from '@/service/api';
+import { createMenu, fetchGetAllRoles, updateMenu } from '@/service/api';
 import {
   getLayoutAndPage,
   getPathParamFromRoutePath,
@@ -254,12 +254,24 @@ async function handleSubmit() {
 
   const params = getSubmitParams();
 
-  console.log('params: ', params);
-
-  // request
-  window.$message?.success($t('common.updateSuccess'));
-  closeDrawer();
-  emit('submitted');
+  model.component = transformLayoutAndPageToComponent(model.layout, model.page);
+  if (props.operateType === 'add' || props.operateType === 'addChild') {
+    await createMenu(params).then(_ => {
+      window.$message?.success($t('common.updateSuccess'));
+      closeDrawer();
+      emit('submitted');
+    });
+  }
+  if (props.operateType === 'edit') {
+    const { id } = props.rowData as Api.SystemManage.Menu;
+    if (id) {
+      await updateMenu(id, params).then(_ => {
+        window.$message?.success($t('common.updateSuccess'));
+        closeDrawer();
+        emit('submitted');
+      });
+    }
+  }
 }
 
 watch(visible, () => {
@@ -359,12 +371,14 @@ watch(
           </NFormItemGi>
           <NFormItemGi span="24 m:12" :label="$t('page.manage.menu.keepAlive')" path="keepAlive">
             <NRadioGroup v-model:value="model.keepAlive">
+              <!-- eslint-disable-next-line vue/prefer-true-attribute-shorthand -->
               <NRadio :value="true" :label="$t('common.yesOrNo.yes')" />
               <NRadio :value="false" :label="$t('common.yesOrNo.no')" />
             </NRadioGroup>
           </NFormItemGi>
           <NFormItemGi span="24 m:12" :label="$t('page.manage.menu.constant')" path="constant">
             <NRadioGroup v-model:value="model.constant">
+              <!-- eslint-disable-next-line vue/prefer-true-attribute-shorthand -->
               <NRadio :value="true" :label="$t('common.yesOrNo.yes')" />
               <NRadio :value="false" :label="$t('common.yesOrNo.no')" />
             </NRadioGroup>
@@ -374,6 +388,7 @@ watch(
           </NFormItemGi>
           <NFormItemGi span="24 m:12" :label="$t('page.manage.menu.hideInMenu')" path="hideInMenu">
             <NRadioGroup v-model:value="model.hideInMenu">
+              <!-- eslint-disable-next-line vue/prefer-true-attribute-shorthand -->
               <NRadio :value="true" :label="$t('common.yesOrNo.yes')" />
               <NRadio :value="false" :label="$t('common.yesOrNo.no')" />
             </NRadioGroup>
@@ -393,6 +408,7 @@ watch(
           </NFormItemGi>
           <NFormItemGi span="24 m:12" :label="$t('page.manage.menu.multiTab')" path="multiTab">
             <NRadioGroup v-model:value="model.multiTab">
+              <!-- eslint-disable-next-line vue/prefer-true-attribute-shorthand -->
               <NRadio :value="true" :label="$t('common.yesOrNo.yes')" />
               <NRadio :value="false" :label="$t('common.yesOrNo.no')" />
             </NRadioGroup>

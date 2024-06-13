@@ -174,6 +174,7 @@ const local: App.I18n.Schema = {
     'multi-menu_second': '菜单二',
     'multi-menu_second_child': '菜单二子菜单',
     'multi-menu_second_child_home': '菜单二子菜单首页',
+    manage_permission: '权限管理',
     exception: '异常页',
     exception_403: '403',
     exception_404: '404',
@@ -309,8 +310,34 @@ const local: App.I18n.Schema = {
       common: {
         status: {
           enable: '启用',
-          disable: '禁用'
+          disable: '禁用',
+          unknown: '未知'
         }
+      },
+      permission: {
+        id: 'ID',
+        title: '权限管理',
+        permissionName: '权限名称',
+        permissionCode: '权限代码',
+        form: {
+          inputPermissionCode: '请输入权限代码',
+          inputPermissionDesc: '请输入权限描述',
+          inputPermissionName: '请输入权限名称'
+        },
+        description: '权限描述',
+        actionCodes: '权限',
+        type: {
+          create: '创建',
+          read: '读取',
+          update: '更新',
+          delete: '删除'
+        },
+        menus: '菜单',
+        permissionStatus: '状态',
+        menusName: '菜单名称',
+        apisName: 'Api名称',
+        addPermission: '添加权限',
+        editPermission: '编辑权限'
       },
       role: {
         title: '角色列表',
@@ -320,11 +347,13 @@ const local: App.I18n.Schema = {
         roleDesc: '角色描述',
         menuAuth: '菜单权限',
         buttonAuth: '按钮权限',
+        permissions: '角色权限',
         form: {
           roleName: '请输入角色名称',
           roleCode: '请输入角色编码',
           roleStatus: '请选择角色状态',
-          roleDesc: '请输入角色描述'
+          roleDesc: '请输入角色描述',
+          selectPermissions: '请选择角色权限'
         },
         addRole: '新增角色',
         editRole: '编辑角色'
@@ -332,6 +361,7 @@ const local: App.I18n.Schema = {
       user: {
         title: '用户列表',
         userName: '用户名',
+        password: '密码',
         userGender: '性别',
         nickName: '昵称',
         userPhone: '手机号',
@@ -345,7 +375,8 @@ const local: App.I18n.Schema = {
           userPhone: '请输入手机号',
           userEmail: '请输入邮箱',
           userStatus: '请选择用户状态',
-          userRole: '请选择用户角色'
+          userRole: '请选择用户角色',
+          password: '请输入密码'
         },
         addUser: '新增用户',
         editUser: '编辑用户',

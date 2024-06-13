@@ -58,7 +58,6 @@ async function getChecks() {
 function handleSubmit() {
   console.log(checks.value, props.roleId);
   // request
-
   window.$message?.success?.($t('common.modifySuccess'));
 
   closeModal();

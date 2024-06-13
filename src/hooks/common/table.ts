@@ -1,5 +1,5 @@
-import { computed, effectScope, onScopeDispose, reactive, ref, watch } from 'vue';
 import type { Ref } from 'vue';
+import { computed, effectScope, onScopeDispose, reactive, ref, watch } from 'vue';
 import type { PaginationProps } from 'naive-ui';
 import { cloneDeep } from 'lodash-es';
 import { useBoolean, useHookTable } from '@sa/hooks';
@@ -16,11 +16,32 @@ export function useTable<A extends NaiveUI.TableApiFn>(config: NaiveUI.NaiveTabl
 
   const isMobile = computed(() => appStore.isMobile);
 
-  const { apiFn, apiParams, immediate, showTotal } = config;
+  const { apiFn, apiParams, immediate, showTotal, transformer: customTransformer } = config;
 
   const SELECTION_KEY = '__selection__';
 
   const EXPAND_KEY = '__expand__';
+
+  // 定义默认的transformer函数
+  const defaultTransformer = (res: any): { total: number; data: any[]; pageSize: number; pageNum: number } => {
+    // ... your transformation logic ...
+    const { records = [], current = 1, size = 10, total = 0 } = res.data || {};
+    // 假设records中的每个item都有确定的类型，比如ApiSystemManageMenu
+    const recordsWithIndex = records.map((item: any, index: number) => {
+      return {
+        ...item,
+        index: (current - 1) * size + index + 1
+      };
+    });
+    return {
+      data: recordsWithIndex,
+      pageNum: current,
+      pageSize: size,
+      total
+    };
+  };
+
+  const finalTransformer = customTransformer || defaultTransformer;
 
   const {
     loading,
@@ -37,23 +58,7 @@ export function useTable<A extends NaiveUI.TableApiFn>(config: NaiveUI.NaiveTabl
     apiFn,
     apiParams,
     columns: config.columns,
-    transformer: res => {
-      const { records = [], current = 1, size = 10, total = 0 } = res.data || {};
-
-      const recordsWithIndex = records.map((item, index) => {
-        return {
-          ...item,
-          index: (current - 1) * size + index + 1
-        };
-      });
-
-      return {
-        data: recordsWithIndex,
-        pageNum: current,
-        pageSize: size,
-        total
-      };
-    },
+    transformer: finalTransformer,
     getColumnChecks: cols => {
       const checks: NaiveUI.TableColumnCheck[] = [];
 
@@ -94,11 +99,7 @@ export function useTable<A extends NaiveUI.TableApiFn>(config: NaiveUI.NaiveTabl
         }
       });
 
-      const filteredColumns = checks
-        .filter(item => item.checked)
-        .map(check => columnMap.get(check.key) as TableColumn<GetTableData<A>>);
-
-      return filteredColumns;
+      return checks.filter(item => item.checked).map(check => columnMap.get(check.key) as TableColumn<GetTableData<A>>);
     },
     onFetched: async transformed => {
       const { pageNum, pageSize, total } = transformed;
@@ -125,7 +126,7 @@ export function useTable<A extends NaiveUI.TableApiFn>(config: NaiveUI.NaiveTabl
         size: pagination.pageSize!
       });
 
-      getData();
+      await getData();
     },
     onUpdatePageSize: async (pageSize: number) => {
       pagination.pageSize = pageSize;
@@ -136,7 +137,7 @@ export function useTable<A extends NaiveUI.TableApiFn>(config: NaiveUI.NaiveTabl
         size: pageSize
       });
 
-      getData();
+      await getData();
     },
     ...(showTotal
       ? {

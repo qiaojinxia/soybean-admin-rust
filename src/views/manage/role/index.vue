@@ -1,6 +1,7 @@
 <script setup lang="tsx">
 import { NButton, NPopconfirm, NTag } from 'naive-ui';
-import { fetchGetRoleList } from '@/service/api';
+import { ref } from 'vue';
+import { deleteRole, deleteRoles, fetchGetRoleList, getSimplePermissions } from '@/service/api';
 import { useAppStore } from '@/store/modules/app';
 import { useTable, useTableOperate } from '@/hooks/common/table';
 import { $t } from '@/locales';
@@ -28,7 +29,7 @@ const { columns, columnChecks, data, loading, getData, mobilePagination, searchP
       width: 48
     },
     {
-      key: 'index',
+      key: 'id',
       title: $t('common.index'),
       width: 64,
       align: 'center'
@@ -108,18 +109,32 @@ const {
   // closeDrawer
 } = useTableOperate(data, getData);
 
+const allPermissions = ref<Api.SystemManage.SimplePermission[] | null>(null);
+
+function getAllPermissions() {
+  getSimplePermissions().then(resp => {
+    allPermissions.value = resp.data;
+  });
+}
+
+function init() {
+  getAllPermissions();
+}
+
+// Init call
+init();
+
 async function handleBatchDelete() {
   // request
-  console.log(checkedRowKeys.value);
-
-  onBatchDeleted();
+  deleteRoles(checkedRowKeys.value.map(key => Number.parseInt(key, 10))).then(_resp => {
+    onBatchDeleted();
+  });
 }
 
 function handleDelete(id: number) {
-  // request
-  console.log(id);
-
-  onDeleted();
+  deleteRole(id).then(_resp => {
+    onDeleted();
+  });
 }
 
 function edit(id: number) {
@@ -158,6 +173,7 @@ function edit(id: number) {
         v-model:visible="drawerVisible"
         :operate-type="operateType"
         :row-data="editingData"
+        :permission-list="allPermissions"
         @submitted="getData"
       />
     </NCard>

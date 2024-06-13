@@ -42,7 +42,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
       await toLogin();
     }
 
-    routeStore.resetStore();
+    await routeStore.resetStore();
   }
 
   /**

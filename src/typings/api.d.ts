@@ -5,6 +5,14 @@
  */
 declare namespace Api {
   namespace Common {
+    interface ApiResponse {
+      data?: {
+        records?: any[]; // 根据实际情况替换为具体的接口类型
+        current?: number;
+        size?: number;
+        total?: number;
+      };
+    }
     /** common params of paginating */
     interface PaginatingCommonParams {
       /** current page number */
@@ -88,16 +96,56 @@ declare namespace Api {
    * backend api module: "systemManage"
    */
   namespace SystemManage {
+    import EnableStatus = Api.Common.EnableStatus;
+
+    enum PermissionAction {
+      CREATE = '1',
+      READ = '2',
+      UPDATE = '3',
+      DELETE = '4'
+    }
+
+    type OptionSample = {
+      /** id */
+      id: number;
+      /** name */
+      name: string;
+    };
+
+    // 定义权限模型接口
+    type Permission = Common.CommonRecord<{
+      id: number;
+      permissionName: string;
+      permissionCode: string;
+      description: string;
+      actionCodes: PermissionAction[]; // 使用PermissionAction枚举类型定义操作列表
+      menus: number[];
+      apis: OptionSample[];
+      status: EnableStatus | null;
+    }>;
+
+    type PermissionList = Common.PaginatingQueryRecord<Permission>;
+
     type CommonSearchParams = Pick<Common.PaginatingCommonParams, 'current' | 'size'>;
+
+    type SimplePermission = {
+      id: number;
+      permissionName: string;
+      permissionCode: string;
+      status: EnableStatus | null;
+    };
 
     /** role */
     type Role = Common.CommonRecord<{
+      id: number;
       /** role name */
       roleName: string;
       /** role code */
       roleCode: string;
       /** role description */
       roleDesc: string;
+      /** role permissions */
+      permissionIds: number[];
     }>;
 
     /** role search params */
@@ -121,11 +169,15 @@ declare namespace Api {
 
     /** user */
     type User = Common.CommonRecord<{
+      /** user id */
+      id: number;
       /** user name */
       userName: string;
+      /** user password */
+      password: string;
       /** user gender */
       userGender: UserGender | null;
-      /** user nick name */
+      /** user nickname */
       nickName: string;
       /** user phone */
       userPhone: string;
@@ -186,6 +238,7 @@ declare namespace Api {
     >;
 
     type Menu = Common.CommonRecord<{
+      id: number;
       /** parent menu id */
       parentId: number;
       /** menu type */

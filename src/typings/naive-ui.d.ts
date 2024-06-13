@@ -50,5 +50,10 @@ declare namespace NaiveUI {
      * @default false
      */
     showTotal?: boolean;
+    transformer?: import('@sa/hooks').TableConfig<
+      A,
+      GetTableData<A>,
+      TableColumn<TableDataWithIndex<GetTableData<A>>>
+    >['transformer'];
   };
 }

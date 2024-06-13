@@ -27,3 +27,12 @@ export const menuIconTypeRecord: Record<Api.SystemManage.IconType, App.I18n.I18n
 };
 
 export const menuIconTypeOptions = transformRecordToOption(menuIconTypeRecord);
+
+export const perMissionTypeRecord: Record<Api.SystemManage.PermissionAction, App.I18n.I18nKey> = {
+  '1': 'page.manage.permission.type.create',
+  '2': 'page.manage.permission.type.read',
+  '3': 'page.manage.permission.type.update',
+  '4': 'page.manage.permission.type.delete'
+};
+
+export const perMissionTypeOptions = transformRecordToOption(perMissionTypeRecord);

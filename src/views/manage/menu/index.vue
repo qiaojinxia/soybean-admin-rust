@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import type { Ref } from 'vue';
 import { NButton, NPopconfirm, NTag } from 'naive-ui';
 import { useBoolean } from '@sa/hooks';
-import { fetchGetAllPages, fetchGetMenuList } from '@/service/api';
+import { deleteMenuById, deleteMenus, fetchGetAllPages, fetchGetMenuList } from '@/service/api';
 import { useAppStore } from '@/store/modules/app';
 import { useTable, useTableOperate } from '@/hooks/common/table';
 import { $t } from '@/locales';
@@ -20,11 +20,45 @@ const wrapperRef = ref<HTMLElement | null>(null);
 
 const { columns, columnChecks, data, loading, pagination, getData } = useTable({
   apiFn: fetchGetMenuList,
+  transformer: res => {
+    const { records = [], current = 1, size = 10, total = 0 } = res.data || {};
+
+    // 将parentId为0的视为根节点，其他为子节点
+    const rootNodes: any = [];
+    const nodesMap: { [key: number]: Api.SystemManage.Menu } = {};
+
+    // 初始化nodesMap，并分离根节点与子节点
+    records.forEach(item => {
+      const id = item.id;
+      nodesMap[id] = { ...item, children: [] };
+      if (item.parentId === 0) {
+        rootNodes.push(nodesMap[id]);
+      }
+    });
+
+    // 构建父子关系
+    records.forEach(item => {
+      const parentId = item.parentId;
+      if (parentId !== 0 && nodesMap[parentId]) {
+        if (!nodesMap[parentId].children) {
+          nodesMap[parentId].children = [];
+        }
+        nodesMap[parentId].children?.push(nodesMap[item.id]);
+      }
+    });
+
+    return {
+      data: rootNodes, // 只返回根节点，每个根节点包含其子节点
+      pageNum: current,
+      pageSize: size,
+      total
+    };
+  },
   columns: () => [
     {
       type: 'selection',
       align: 'center',
-      width: 48
+      width: 30
     },
     {
       key: 'id',
@@ -143,7 +177,7 @@ const { columns, columnChecks, data, loading, pagination, getData } = useTable({
       key: 'operate',
       title: $t('common.operate'),
       align: 'center',
-      width: 230,
+      width: 250,
       render: row => (
         <div class="flex-center justify-end gap-8px">
           {row.menuType === '1' && (
@@ -181,15 +215,13 @@ function handleAdd() {
 
 async function handleBatchDelete() {
   // request
-  console.log(checkedRowKeys.value);
-
-  onBatchDeleted();
+  await deleteMenus(checkedRowKeys.value);
+  await onBatchDeleted();
 }
 
 function handleDelete(id: number) {
   // request
-  console.log(id);
-
+  deleteMenuById(id);
   onDeleted();
 }
 

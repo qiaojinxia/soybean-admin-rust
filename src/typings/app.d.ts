@@ -485,6 +485,7 @@ declare namespace App {
             status: {
               enable: string;
               disable: string;
+              unknown: string;
             };
           };
           role: {
@@ -493,11 +494,13 @@ declare namespace App {
             roleCode: string;
             roleStatus: string;
             roleDesc: string;
+            permissions: string;
             form: {
               roleName: string;
               roleCode: string;
               roleStatus: string;
               roleDesc: string;
+              selectPermissions: string;
             };
             addRole: string;
             editRole: string;
@@ -507,6 +510,7 @@ declare namespace App {
           user: {
             title: string;
             userName: string;
+            password: string;
             userGender: string;
             nickName: string;
             userPhone: string;
@@ -521,6 +525,7 @@ declare namespace App {
               userEmail: string;
               userStatus: string;
               userRole: string;
+              password: string;
             };
             addUser: string;
             editUser: string;
@@ -528,6 +533,31 @@ declare namespace App {
               male: string;
               female: string;
             };
+          };
+          permission: {
+            id: string;
+            title: string;
+            permissionName: string;
+            permissionCode: string;
+            form: {
+              inputPermissionCode: string;
+              inputPermissionDesc: string;
+              inputPermissionName: string;
+            };
+            description: string;
+            actionCodes: string;
+            type: {
+              create: string;
+              read: string;
+              update: string;
+              delete: string;
+            };
+            menusName: string;
+            apisName: string;
+            addPermission: string;
+            editPermission: string;
+            permissionStatus: string;
+            menus: string;
           };
           menu: {
             home: string;
@@ -678,7 +708,7 @@ declare namespace App {
     /** The backend service response data */
     type Response<T = unknown> = {
       /** The backend service response code */
-      code: string;
+      code: number;
       /** The backend service response message */
       msg: string;
       /** The backend service response data */

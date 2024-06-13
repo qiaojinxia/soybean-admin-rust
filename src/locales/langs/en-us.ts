@@ -174,6 +174,7 @@ const local: App.I18n.Schema = {
     'multi-menu_second': 'Menu Two',
     'multi-menu_second_child': 'Menu Two Child',
     'multi-menu_second_child_home': 'Menu Two Child Home',
+    manage_permission: 'Permission Mange',
     exception: 'Exception',
     exception_403: '403',
     exception_404: '404',
@@ -309,8 +310,34 @@ const local: App.I18n.Schema = {
       common: {
         status: {
           enable: 'Enable',
-          disable: 'Disable'
+          disable: 'Disable',
+          unknown: 'Unknown'
         }
+      },
+      permission: {
+        id: 'ID',
+        title: 'Permission List',
+        permissionName: 'Permission Name',
+        permissionCode: 'Permission Code',
+        form: {
+          inputPermissionCode: 'please input Permission Code',
+          inputPermissionDesc: 'please input Permission Desc',
+          inputPermissionName: 'please input Permission Name'
+        },
+        description: 'Permission Description',
+        actionCodes: 'permission',
+        type: {
+          create: 'Create',
+          read: 'Read',
+          update: 'Update',
+          delete: 'Delete'
+        },
+        menus: 'Menus',
+        permissionStatus: 'status',
+        menusName: 'Menu Name',
+        apisName: 'Api Name',
+        addPermission: 'Add Permission',
+        editPermission: 'Edit Permission'
       },
       role: {
         title: 'Role List',
@@ -320,11 +347,13 @@ const local: App.I18n.Schema = {
         roleDesc: 'Role Description',
         menuAuth: 'Menu Auth',
         buttonAuth: 'Button Auth',
+        permissions: 'Role Permissions',
         form: {
           roleName: 'Please enter role name',
           roleCode: 'Please enter role code',
           roleStatus: 'Please select role status',
-          roleDesc: 'Please enter role description'
+          roleDesc: 'Please enter role description',
+          selectPermissions: 'Please select role permissions'
         },
         addRole: 'Add Role',
         editRole: 'Edit Role'
@@ -332,6 +361,7 @@ const local: App.I18n.Schema = {
       user: {
         title: 'User List',
         userName: 'User Name',
+        password: 'password',
         userGender: 'Gender',
         nickName: 'Nick Name',
         userPhone: 'Phone Number',
@@ -345,7 +375,8 @@ const local: App.I18n.Schema = {
           userPhone: 'Please enter phone number',
           userEmail: 'Please enter email',
           userStatus: 'Please select user status',
-          userRole: 'Please select user role'
+          userRole: 'Please select user role',
+          password: 'Please enter password'
         },
         addUser: 'Add User',
         editUser: 'Edit User',

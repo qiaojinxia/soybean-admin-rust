@@ -61,9 +61,8 @@ const tree = shallowRef<Api.SystemManage.MenuTree[]>([]);
 
 async function getTree() {
   const { error, data } = await fetchGetMenuTree();
-
   if (!error) {
-    tree.value = data;
+    tree.value.fill(data);
   }
 }
 

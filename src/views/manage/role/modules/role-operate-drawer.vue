@@ -4,8 +4,10 @@ import { useBoolean } from '@sa/hooks';
 import { useFormRules, useNaiveForm } from '@/hooks/common/form';
 import { $t } from '@/locales';
 import { enableStatusOptions } from '@/constants/business';
+import { createRoles, updateRole } from '@/service/api';
 import MenuAuthModal from './menu-auth-modal.vue';
 import ButtonAuthModal from './button-auth-modal.vue';
+import SimplePermission = Api.SystemManage.SimplePermission;
 
 defineOptions({
   name: 'RoleOperateDrawer'
@@ -16,6 +18,7 @@ interface Props {
   operateType: NaiveUI.TableOperateType;
   /** the edit row data */
   rowData?: Api.SystemManage.Role | null;
+  permissionList: SimplePermission[] | null;
 }
 
 const props = defineProps<Props>();
@@ -43,20 +46,22 @@ const title = computed(() => {
   return titles[props.operateType];
 });
 
-type Model = Pick<Api.SystemManage.Role, 'roleName' | 'roleCode' | 'roleDesc' | 'status'>;
+type Model = Pick<Api.SystemManage.Role, 'id' | 'roleName' | 'roleCode' | 'roleDesc' | 'permissionIds' | 'status'>;
 
 const model: Model = reactive(createDefaultModel());
 
 function createDefaultModel(): Model {
   return {
+    id: 0,
     roleName: '',
     roleCode: '',
     roleDesc: '',
+    permissionIds: [],
     status: null
   };
 }
 
-type RuleKey = Exclude<keyof Model, 'roleDesc'>;
+type RuleKey = Exclude<keyof Model, 'id' | 'roleDesc' | 'permissionIds'>;
 
 const rules: Record<RuleKey, App.Global.FormRule> = {
   roleName: defaultRequiredRule,
@@ -67,6 +72,16 @@ const rules: Record<RuleKey, App.Global.FormRule> = {
 const roleId = computed(() => props.rowData?.id || -1);
 
 const isEdit = computed(() => props.operateType === 'edit');
+
+const permissionOptions = computed(() => {
+  return (
+    props.permissionList?.map(permission => ({
+      label: permission.permissionName,
+      value: permission.id,
+      key: permission.id
+    })) || []
+  );
+});
 
 function handleInitModel() {
   Object.assign(model, createDefaultModel());
@@ -82,8 +97,17 @@ function closeDrawer() {
 
 async function handleSubmit() {
   await validate();
-  // request
-  window.$message?.success($t('common.updateSuccess'));
+  if (props.operateType === 'add') {
+    await createRoles(model).then(_resp => {
+      window.$message?.success($t('common.addSuccess'));
+    });
+  } else if (props.operateType === 'edit' && props.rowData) {
+    const { id, ...rest } = model;
+    await updateRole(id, rest).then(_resp => {
+      window.$message?.success($t('common.updateSuccess'));
+    });
+  }
+
   closeDrawer();
   emit('submitted');
 }
@@ -113,6 +137,15 @@ watch(visible, () => {
         </NFormItem>
         <NFormItem :label="$t('page.manage.role.roleDesc')" path="roleDesc">
           <NInput v-model:value="model.roleDesc" :placeholder="$t('page.manage.role.form.roleDesc')" />
+        </NFormItem>
+        <NFormItem :label="$t('page.manage.role.permissions')" path="permissionIds">
+          <NTreeSelect
+            v-model:value="model.permissionIds"
+            :options="permissionOptions"
+            :placeholder="$t('page.manage.role.form.selectPermissions')"
+            multiple
+            :show-path="true"
+          />
         </NFormItem>
       </NForm>
       <NSpace v-if="isEdit">
