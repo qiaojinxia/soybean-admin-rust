@@ -213,7 +213,7 @@ export function useTableOperate<T extends TableData = TableData>(data: Ref<T[]>,
   }
 
   /** the checked row keys of table */
-  const checkedRowKeys = ref<string[]>([]);
+  const checkedRowKeys = ref<number[]>([]);
 
   /** the hook after the batch delete operation is completed */
   async function onBatchDeleted() {

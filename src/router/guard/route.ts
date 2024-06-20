@@ -106,14 +106,12 @@ async function initRoute(to: RouteLocationNormalized): Promise<RouteLocationRaw 
     if (isNotFoundRoute) {
       const path = to.fullPath;
 
-      const location: RouteLocationRaw = {
+      return {
         path,
         replace: true,
         query: to.query,
         hash: to.hash
       };
-
-      return location;
     }
   }
 
@@ -133,11 +131,9 @@ async function initRoute(to: RouteLocationNormalized): Promise<RouteLocationRaw 
     const noPermissionRoute: RouteKey = '403';
 
     if (exist) {
-      const location: RouteLocationRaw = {
+      return {
         name: noPermissionRoute
       };
-
-      return location;
     }
 
     return null;
@@ -152,12 +148,10 @@ async function initRoute(to: RouteLocationNormalized): Promise<RouteLocationRaw 
 
     const query: LocationQueryRaw = to.name !== loginRoute ? { redirect } : {};
 
-    const location: RouteLocationRaw = {
+    return {
       name: loginRoute,
       query
     };
-
-    return location;
   }
 
   // initialize the auth route
@@ -169,14 +163,12 @@ async function initRoute(to: RouteLocationNormalized): Promise<RouteLocationRaw 
     const rootRoute: RouteKey = 'root';
     const path = to.redirectedFrom?.name === rootRoute ? '/' : to.fullPath;
 
-    const location: RouteLocationRaw = {
+    return {
       path,
       replace: true,
       query: to.query,
       hash: to.hash
     };
-
-    return location;
   }
 
   return null;

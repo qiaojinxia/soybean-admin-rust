@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue';
 import { useFormRules, useNaiveForm } from '@/hooks/common/form';
-import { createUser, fetchGetAllRoles, updateRole } from '@/service/api';
+import { createUser, fetchGetAllRoles, updateUser } from '@/service/api';
 import { $t } from '@/locales';
 import { enableStatusOptions, userGenderOptions } from '@/constants/business';
 
@@ -70,25 +70,17 @@ const rules: Record<RuleKey, App.Global.FormRule> = {
 };
 
 /** the enabled role options */
-const roleOptions = ref<CommonType.Option<string>[]>([]);
+const roleOptions = ref<CommonType.Option<number>[]>([]);
 
 async function getRoleOptions() {
   const { error, data } = await fetchGetAllRoles();
   if (!error) {
     const options = data.map(item => ({
-      label: item.roleName,
-      value: item.roleCode
+      label: item.roleCode,
+      value: item.id
     }));
 
-    // the mock data does not have the roleCode, so fill it
-    // if the real request, remove the following code
-    const userRoleOptions = model.userRoles.map(item => ({
-      label: item,
-      value: item
-    }));
-    // end
-
-    roleOptions.value = [...userRoleOptions, ...options];
+    roleOptions.value = [...options];
   }
 }
 
@@ -112,7 +104,7 @@ async function handleSubmit() {
     });
   } else if (props.operateType === 'edit' && props.rowData) {
     const { id, ...rest } = model;
-    await updateRole(id, rest).then(_resp => {
+    await updateUser(id, rest).then(_resp => {
       window.$message?.success($t('common.updateSuccess'));
     });
   }

@@ -6,6 +6,9 @@ import { $t } from '@/locales';
 import { enableStatusOptions, perMissionTypeOptions } from '@/constants/business';
 import { createPermission, updatePermission } from '@/service/api';
 import { translateOptions } from '@/utils/common';
+import ButtonAuthModal from '@/views/manage/permission/modules/button-auth-modal.vue';
+import MenuAuthModal from '@/views/manage/permission/modules/menu-auth-modal.vue';
+import { useBoolean } from '~/packages/hooks';
 
 defineOptions({
   name: 'PermissionOperateDrawer'
@@ -36,6 +39,8 @@ const visible = defineModel<boolean>('visible', {
 
 const { formRef, validate, restoreValidation } = useNaiveForm();
 const { defaultRequiredRule } = useFormRules();
+const { bool: menuAuthVisible, setTrue: openMenuAuthModal } = useBoolean();
+const { bool: buttonAuthVisible, setTrue: openButtonAuthModal } = useBoolean();
 
 const title = computed(() => {
   const titles: Record<OperateType, string> = {
@@ -61,11 +66,15 @@ function createDefaultModel(): Model {
     description: '',
     actionCodes: [],
     menus: [],
-    status: null
+    status: '1'
   };
 }
 
 type RuleKey = Extract<keyof Model, 'permissionName' | 'permissionCode' | 'description'>;
+
+const roleId = computed(() => props.rowData?.id || -1);
+
+const isEdit = computed(() => props.operateType === 'edit');
 
 const rules: Record<RuleKey, App.Global.FormRule> = {
   permissionName: defaultRequiredRule,
@@ -190,6 +199,12 @@ watch(visible, () => {
             <NRadio v-for="item in enableStatusOptions" :key="item.value" :value="item.value" :label="$t(item.label)" />
           </NRadioGroup>
         </NFormItem>
+        <NSpace v-if="isEdit">
+          <NButton @click="openMenuAuthModal">{{ $t('page.manage.role.menuAuth') }}</NButton>
+          <MenuAuthModal v-model:visible="menuAuthVisible" :role-id="roleId" />
+          <NButton @click="openButtonAuthModal">{{ $t('page.manage.role.buttonAuth') }}</NButton>
+          <ButtonAuthModal v-model:visible="buttonAuthVisible" :role-id="roleId" />
+        </NSpace>
       </NForm>
       <template #footer>
         <NSpace :size="16">

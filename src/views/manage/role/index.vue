@@ -126,7 +126,7 @@ init();
 
 async function handleBatchDelete() {
   // request
-  deleteRoles(checkedRowKeys.value.map(key => Number.parseInt(key, 10))).then(_resp => {
+  deleteRoles(checkedRowKeys.value).then(_resp => {
     onBatchDeleted();
   });
 }

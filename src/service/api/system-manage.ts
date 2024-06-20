@@ -177,3 +177,26 @@ export function createUser(data: any) {
     data
   });
 }
+
+export function updateUser(id: number, data: any) {
+  return request<Api.SystemManage.User>({
+    url: `/system-manage/users/${id}`,
+    method: 'put',
+    data
+  });
+}
+
+export function deleteUser(id: number) {
+  return request<Api.SystemManage.User>({
+    url: `/system-manage/users/${id}`,
+    method: 'delete'
+  });
+}
+
+export function batchDeleteUsers(ids: number[]) {
+  return request<Api.SystemManage.User>({
+    url: `/system-manage/users`,
+    method: 'delete',
+    data: ids
+  });
+}
