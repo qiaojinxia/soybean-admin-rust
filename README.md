@@ -159,7 +159,7 @@ Thanks the following people for their contributions. If you want to contribute t
   </div>
 	<!-- <div>
 		<p>WeChat Group</p>
-		<img src="https://soybeanjs-1300612522.cos.ap-guangzhou.myqcloud.com/uPic/wechat-0402.jpg" style="width:200px" />
+		<img src="https://soybeanjs-1300612522.cos.ap-guangzhou.myqcloud.com/picgo/soybean-admin-wechat-0620.jpg" style="width:200px" />
 	</div> -->
 	<div>
 		<p>Add the following WeChat to invite to the WeChat group</p>

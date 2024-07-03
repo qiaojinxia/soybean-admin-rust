@@ -219,7 +219,7 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
   /** Init auth route */
   async function initAuthRoute() {
     if (authRouteMode.value === 'static') {
-      await initStaticAuthRoute();
+      initStaticAuthRoute();
     } else {
       await initDynamicAuthRoute();
     }
@@ -228,7 +228,7 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
   }
 
   /** Init static auth route */
-  async function initStaticAuthRoute() {
+  function initStaticAuthRoute() {
     const { authRoutes: staticAuthRoutes } = createStaticRoutes();
 
     if (authStore.isStaticSuper) {
@@ -262,7 +262,7 @@ export const useRouteStore = defineStore(SetupStoreId.Route, () => {
       setIsInitAuthRoute(true);
     } else {
       // if fetch user routes failed, reset store
-      authStore.resetStore();
+      await authStore.resetStore();
     }
   }
 
