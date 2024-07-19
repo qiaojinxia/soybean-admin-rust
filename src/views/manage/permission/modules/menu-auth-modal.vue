@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { computed, shallowRef, watch } from 'vue';
 import { $t } from '@/locales';
-import { fetchGetAllPages, fetchGetMenuTree } from '@/service/api';
+import { fetchGetAllPages, fetchGetMenuTree, fetchMenuIdsByPermissionCode, updatePermission } from '@/service/api';
 
 defineOptions({
   name: 'MenuAuthModal'
 });
 
 interface Props {
-  /** the roleId */
-  roleId: number;
+  /** the permissionCode */
+  permissionCode: string;
+  /** the permissionCode */
+  pid: number;
 }
 
 const props = defineProps<Props>();
@@ -27,14 +29,11 @@ const title = computed(() => $t('common.edit') + $t('page.manage.role.menuAuth')
 const home = shallowRef('');
 
 async function getHome() {
-  console.log(props.roleId);
-
   home.value = 'home';
 }
 
 async function updateHome(val: string) {
   // request
-
   home.value = val;
 }
 
@@ -42,7 +41,6 @@ const pages = shallowRef<string[]>([]);
 
 async function getPages() {
   const { error, data } = await fetchGetAllPages();
-
   if (!error) {
     pages.value = data;
   }
@@ -62,22 +60,25 @@ const tree = shallowRef<Api.SystemManage.MenuTree[]>([]);
 async function getTree() {
   const { error, data } = await fetchGetMenuTree();
   if (!error) {
-    tree.value.fill(data);
+    tree.value = data.children || [];
   }
 }
 
 const checks = shallowRef<number[]>([]);
 
 async function getChecks() {
-  console.log(props.roleId);
-  // request
-  checks.value = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
+  const { error, data } = await fetchMenuIdsByPermissionCode(props.permissionCode);
+  if (!error) {
+    // request
+    checks.value = data?.menuIds;
+  }
 }
 
 function handleSubmit() {
-  console.log(checks.value, props.roleId);
+  updatePermission(props.pid, {
+    menus: checks.value || []
+  });
   // request
-
   window.$message?.success?.($t('common.modifySuccess'));
 
   closeModal();

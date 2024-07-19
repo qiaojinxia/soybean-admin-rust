@@ -200,3 +200,10 @@ export function batchDeleteUsers(ids: number[]) {
     data: ids
   });
 }
+
+export function fetchMenuIdsByPermissionCode(permissionCode: string) {
+  return request<Api.SystemManage.PermissionMenuIds>({
+    url: `/system-manage/permissions/menus/${permissionCode}`,
+    method: 'get'
+  });
+}

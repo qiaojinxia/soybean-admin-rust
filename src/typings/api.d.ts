@@ -112,6 +112,9 @@ declare namespace Api {
       name: string;
     };
 
+    type PermissionMenuIds = {
+      menuIds: number[];
+    };
     // 定义权限模型接口
     type Permission = Common.CommonRecord<{
       id: number;

@@ -1,6 +1,5 @@
 <script setup lang="tsx">
 import { computed, reactive, watch } from 'vue';
-import type { TreeSelectOption } from 'naive-ui';
 import { useFormRules, useNaiveForm } from '@/hooks/common/form';
 import { $t } from '@/locales';
 import { enableStatusOptions, perMissionTypeOptions } from '@/constants/business';
@@ -72,7 +71,9 @@ function createDefaultModel(): Model {
 
 type RuleKey = Extract<keyof Model, 'permissionName' | 'permissionCode' | 'description'>;
 
-const roleId = computed(() => props.rowData?.id || -1);
+const permissionId = computed(() => props.rowData?.id || -1);
+
+const permissionCode = computed(() => props.rowData?.permissionCode || '');
 
 const isEdit = computed(() => props.operateType === 'edit');
 
@@ -81,31 +82,6 @@ const rules: Record<RuleKey, App.Global.FormRule> = {
   description: defaultRequiredRule,
   permissionCode: defaultRequiredRule
 };
-
-// Assuming props and Api.SystemManage.MenuTree are defined elsewhere
-const menuOptions = computed<TreeSelectOption[]>(() => {
-  // Transform a single MenuTree object into TreeSelectOption format
-  const transformMenuTree = (menu: Api.SystemManage.MenuTree): TreeSelectOption => {
-    const transformed: TreeSelectOption = {
-      key: `${menu.id}`,
-      label: menu.label,
-      disabled: false, // Assuming you have a 'disabled' field
-      isLeaf: !(menu.children && menu.children.length > 0)
-    };
-    if (menu.children && menu.children.length > 0) {
-      transformed.children = menu.children.map(child => transformMenuTree(child));
-    }
-    return transformed;
-  };
-
-  // Check if 'props.allMenus' is not null and is an object
-  if (!props.allMenus || typeof props.allMenus !== 'object') {
-    return [];
-  }
-
-  // Since 'props.allMenus' is a single object, wrap the result in an array
-  return transformMenuTree(props.allMenus).children || [];
-});
 
 function handleUpdateModel() {
   if (props.operateType === 'add') {
@@ -191,9 +167,6 @@ watch(visible, () => {
         <NFormItem :label="$t('page.manage.permission.actionCodes')" path="actions">
           <NSelect v-model:value="model.actionCodes" multiple :options="translateOptions(perMissionTypeOptions)" />
         </NFormItem>
-        <NFormItem :label="$t('page.manage.permission.menus')" path="menus">
-          <NTreeSelect v-model:value="model.menus" multiple cascade checkable :options="menuOptions" />
-        </NFormItem>
         <NFormItem :label="$t('page.manage.permission.permissionStatus')" path="status">
           <NRadioGroup v-model:value="model.status">
             <NRadio v-for="item in enableStatusOptions" :key="item.value" :value="item.value" :label="$t(item.label)" />
@@ -201,9 +174,9 @@ watch(visible, () => {
         </NFormItem>
         <NSpace v-if="isEdit">
           <NButton @click="openMenuAuthModal">{{ $t('page.manage.role.menuAuth') }}</NButton>
-          <MenuAuthModal v-model:visible="menuAuthVisible" :role-id="roleId" />
+          <MenuAuthModal v-model:visible="menuAuthVisible" :pid="permissionId" :permission-code="permissionCode" />
           <NButton @click="openButtonAuthModal">{{ $t('page.manage.role.buttonAuth') }}</NButton>
-          <ButtonAuthModal v-model:visible="buttonAuthVisible" :role-id="roleId" />
+          <ButtonAuthModal v-model:visible="buttonAuthVisible" :role-id="permissionId" />
         </NSpace>
       </NForm>
       <template #footer>
