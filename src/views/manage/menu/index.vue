@@ -18,7 +18,7 @@ const { bool: visible, setTrue: openModal } = useBoolean();
 
 const wrapperRef = ref<HTMLElement | null>(null);
 
-const { columns, columnChecks, data, loading, pagination, getData } = useTable({
+const { columns, columnChecks, data, loading, pagination, getData, getDataByPage } = useTable({
   apiFn: fetchGetMenuList,
   transformer: res => {
     const { records = [], current = 1, size = 10, total = 0 } = res.data || {};
@@ -289,7 +289,7 @@ init();
         :operate-type="operateType"
         :row-data="editingData"
         :all-pages="allPages"
-        @submitted="getData"
+        @submitted="getDataByPage"
       />
     </NCard>
   </div>
